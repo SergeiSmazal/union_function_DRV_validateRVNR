@@ -4,6 +4,7 @@ exports.handler = async (event) => {
     const rvnr = body.rvnr;
 
     if (!rvnr) {
+        console.log("Fehler: Parameter 'rvnr' fehlt im Request.");
         return {
             statusCode: 400,
             headers: { "Content-Type": "application/json" },
@@ -14,20 +15,29 @@ exports.handler = async (event) => {
     // Funktion zur Validierung der Rentenversicherungsnummer (RVNR)
     function DRV_validateRVNR(num) {
         // Prüfung, ob die Länge exakt 12 Zeichen beträgt
-        if (!num || num.length !== 12) return false;
+        if (!num || num.length !== 12) {
+            console.log(`Ungültige Länge (${num ? num.length : 0} Zeichen): ${num}`);
+            return false;
+        }
 
         // In Großbuchstaben umwandeln
         const upperNum = num.toUpperCase();
 
         // 1. Prüfziffer extrahieren (12. Zeichen, Index 11)
         const checkDigit = parseInt(upperNum[11], 10);
-        if (isNaN(checkDigit)) return false;
+        if (isNaN(checkDigit)) {
+            console.log(`Prüfziffer ist keine Zahl: ${upperNum[11]}`);
+            return false;
+        }
 
         // 2. Den Anfangsbuchstaben des Geburtsnamens (9. Zeichen, Index 8) in eine zweistellige Zahl umwandeln
         // Standard: A = 01, B = 02, ..., Z = 26
         const letterChar = upperNum[8];
         const charCode = letterChar.charCodeAt(0);
-        if (charCode < 65 || charCode > 90) return false; // Sicherstellen, dass es ein Großbuchstabe ist
+        if (charCode < 65 || charCode > 90) {
+            console.log(`Ungültiger Buchstabe an Index 8: ${letterChar}`);
+            return false; // Sicherstellen, dass es ein Großbuchstabe ist
+        }
         
         const letterDigit = charCode - 64; // A = 1, B = 2 ... Z = 26
         const letterString = letterDigit.toString().padStart(2, '0');
@@ -54,6 +64,9 @@ exports.handler = async (event) => {
 
         // 5. Die errechnete Prüfziffer ist der Rest der Gesamtsumme modulo 10
         const calculatedCheckDigit = totalCrossSum % 10;
+
+        // Debug-Ausgabe in den Logs für die Analyse
+        console.log(`Eingegeben: ${num} | Erwartete Prüfziffer: ${calculatedCheckDigit} | Übergebene Prüfziffer: ${checkDigit}`);
 
         return calculatedCheckDigit === checkDigit;
     }
