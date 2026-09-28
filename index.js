@@ -48,7 +48,8 @@ exports.handler = async (event) => {
         if (cleanRVNR.length !== 12) return false;
 
         // 4. Gewichtungsfaktoren für die 12 Positionen gemäß SV-Anweisung / DRV
-        const weights = [2, 1, 2, 5, 7, 1, 2, 1, 2, 1, 2, 1];
+        // ⚠️ WICHTIG: Die Gewichte müssen in UMGEKEHRTER Reihenfolge angewendet werden!
+        const weights = [1, 2, 1, 2, 1, 2, 1, 2, 5, 2, 1, 2];
 
         let totalCrossSum = 0;
 
