@@ -73,12 +73,7 @@ exports.handler = async (event) => {
 
     const isValid = DRV_validateRVNR(rvnr);
 
-    // Ergebnis im JSON-Format zurückgeben
     return {
-        statusCode: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            isValid
-        })
+        isValid: isValid
     };
 };
